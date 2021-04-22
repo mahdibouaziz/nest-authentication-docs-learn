@@ -1,8 +1,12 @@
-import { Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
+
   /* 
     With @UseGuards(AuthGuard('local')) 
     we are using an AuthGuard that @nestjs/passport
@@ -17,6 +21,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req) {
+    return await this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
     return req.user;
   }
 }
